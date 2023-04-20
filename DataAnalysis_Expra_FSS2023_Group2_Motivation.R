@@ -1,5 +1,12 @@
 # Test if you see this your piece of code GitHub worked
-# verny nice but do I also see changes on GitHub?
+# very nice but do I also see changes on GitHub?
+
+# Little Git Hub Guide
+#' 0. First before push anything: Pull everything. Click on Git --> Pull
+#' 1. Click on Git
+#' 2. Mark file you have been working on
+#' 3. Click on commit and make your comment (in pop up window)
+#' 4. Click on push
 
 # Preparations for analyses -----------------------------------------------
 
