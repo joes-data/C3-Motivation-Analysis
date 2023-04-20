@@ -1,6 +1,8 @@
 # Test if you see this your piece of code GitHub worked
 # very nice but do I also see changes on GitHub?
 
+# Pull Pull Pull Pull Pull Pull before commiting
+
 # Little Git Hub Guide
 #' 0. First before push anything: Pull everything. Click on Git --> Pull
 #' 1. Click on Git
