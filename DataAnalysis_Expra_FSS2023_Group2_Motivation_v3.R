@@ -28,6 +28,7 @@ data <- read.csv("FinalData_Expra_Group2_Motivation_2023.csv", stringsAsFactors 
 # Extend this list with whatever packages you need
 library(tidyverse)
 library(afex)
+library(emmeans)
 
 ## How many participants in our data set?
 n_distinct(data$VPN) # 116 participants
@@ -365,6 +366,18 @@ data_H1 <- data_scales %>%
   select(VPN, condition, likelihood_decision)
   
 # Run analysis: ANOVA with contrasts (use 'aov_ez' function from afex package)
+data_H1$condition <- as.factor(data_H1$condition) #CHECK when changing data set (levels: control pro_economy pro_environment)
+contrast_H1 <- c(0, 1, -1)
+
+#create reference grid
+refGrid_1 <- emmeans(aov_ez(id = "VPN", data = data_H1, dv = "likelihood_decision", 
+                          between = c("condition")), specs = c("condition"))
+between_contrast_1 <- contrast(refGrid_1, list(contrast_H1))
+
+# one-factor ANOVA without planned contrasts
+between <- aov_ez(id = "VPN", dv = "likelihood_decision", data = data_H1, between = "condition")
+summary(between)
+between$Anova
 
 ## (H2) Probability of searching pro-economy information follows this pattern: pro-economy > control > pro-environment
 
@@ -391,6 +404,13 @@ data_H2 <- data_scales %>%
   select(VPN, condition, probability_source)
 
 # Run analysis: ANOVA with contrasts
+data_H2$condition <- as.factor(data_H2$condition) #CHECK when changing data set (levels: control pro_economy pro_environment)
+contrast_H2 <- c(0, 1, -1)
+
+#create reference grid
+refGrid_2 <- emmeans(aov_ez(id = "VPN", data = data_H2, dv = "probability_source", 
+                            between = c("condition")), specs = c("condition"))
+between_contrast_2 <- contrast(refGrid_2, list(contrast_H2))
 
 ## (H3) Rating of neutral information as speaking for building the mine follows this pattern: pro-economy > control > pro-environment
 
@@ -403,6 +423,13 @@ data_H3 <- data_scales %>%
   summarise(mean_eval_info = mean(eval_info))
 
 # Run analysis: ANOVA with contrasts
+data_H3$condition <- as.factor(data_H3$condition) #CHECK when changing data set (levels: control pro_economy pro_environment)
+contrast_H3 <- c(0, 1, -1)
+
+#create reference grid
+refGrid_3 <- emmeans(aov_ez(id = "VPN", data = data_H3, dv = "mean_eval_info", 
+                            between = c("condition")), specs = c("condition"))
+between_contrast_3 <- contrast(refGrid_3, list(contrast_H3))
 
 ## (H4a) Rating of information at t-1 predicts rating of case at t
 ## (H4b)Relationship of ratings is moderated by motivation manipulation
