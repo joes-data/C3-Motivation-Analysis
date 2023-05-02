@@ -454,33 +454,60 @@ plot_data_1 <- data_H1 %>%
   group_by(condition)%>%
   summarize(m = mean(likelihood_decision))
 
+#barplot
 ggplot(data = plot_data_1, mapping = aes(x = condition, y = m, fill = condition))+
   geom_bar(stat = "identity")+
   ylab("mean")+
   xlab("condition")+
   ggtitle("Likelihood to build the mine")+
-  theme_minimal()
+  theme_minimal()+
+  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+
+#boxplot
+ggplot(data = data_H1, mapping = aes(x = condition, y = likelihood_decision, fill = condition))+
+  geom_boxplot()+
+  ggtitle("Likelihood to build the mine")+
+  theme_minimal()+
+  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
 
 ## (H2) Probability of searching pro-economy information follows this pattern: pro-economy > control > pro-environment
 plot_data_2 <- data_H2 %>%
   group_by(condition)%>%
   summarize(m = mean(probability_source))
 
+#barplot
 ggplot(data = plot_data_2, mapping = aes(x = condition, y = m, fill = condition))+
   geom_bar(stat = "identity")+
   ylab("mean")+
   xlab("condition")+
   ggtitle("Percentage of opened economy related claims")+
-  theme_minimal()
+  theme_minimal()+
+  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+
+#boxplot
+ggplot(data = data_H2, mapping = aes(x = condition, y = probability_source, fill = condition))+
+  geom_boxplot()+
+  ggtitle("Percentage of opened economy related claims")+
+  theme_minimal()+
+  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
 
 ## (H3) Rating of neutral information as speaking for building the mine follows this pattern: pro-economy > control > pro-environment
 plot_data_3 <- data_H3 %>%
   group_by(condition)%>%
   summarize(m = mean(mean_eval_info))
 
+#barplot
 ggplot(data = plot_data_3, mapping = aes(x = condition, y = m, fill = condition))+
   geom_bar(stat = "identity")+
   ylab("mean")+
   xlab("condition")+
   ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
-  theme_minimal()
+  theme_minimal()+
+  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+
+#boxplot
+ggplot(data = data_H3, mapping = aes(x = condition, y = mean_eval_info, fill = condition))+
+  geom_boxplot()+
+  ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
+  theme_minimal()+
+  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
