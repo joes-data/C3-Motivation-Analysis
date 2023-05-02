@@ -29,6 +29,7 @@ data <- read.csv("FinalData_Expra_Group2_Motivation_2023.csv", stringsAsFactors 
 library(tidyverse)
 library(afex)
 library(emmeans)
+library(ggplot2)
 
 ## How many participants in our data set?
 n_distinct(data$VPN) # 116 participants
@@ -446,3 +447,40 @@ between_contrast_3 <- contrast(refGrid_3, list(contrast_H3))
 
 ## 2) Influence of covariates
 
+# PLOTS
+
+## (H1) Rated likelihood of building mine follows this pattern: pro-economy > control > pro-environment
+plot_data_1 <- data_H1 %>%
+  group_by(condition)%>%
+  summarize(m = mean(likelihood_decision))
+
+ggplot(data = plot_data_1, mapping = aes(x = condition, y = m, fill = condition))+
+  geom_bar(stat = "identity")+
+  ylab("mean")+
+  xlab("condition")+
+  ggtitle("Likelihood to build the mine")+
+  theme_minimal()
+
+## (H2) Probability of searching pro-economy information follows this pattern: pro-economy > control > pro-environment
+plot_data_2 <- data_H2 %>%
+  group_by(condition)%>%
+  summarize(m = mean(probability_source))
+
+ggplot(data = plot_data_2, mapping = aes(x = condition, y = m, fill = condition))+
+  geom_bar(stat = "identity")+
+  ylab("mean")+
+  xlab("condition")+
+  ggtitle("Percentage of opened economy related claims")+
+  theme_minimal()
+
+## (H3) Rating of neutral information as speaking for building the mine follows this pattern: pro-economy > control > pro-environment
+plot_data_3 <- data_H3 %>%
+  group_by(condition)%>%
+  summarize(m = mean(mean_eval_info))
+
+ggplot(data = plot_data_3, mapping = aes(x = condition, y = m, fill = condition))+
+  geom_bar(stat = "identity")+
+  ylab("mean")+
+  xlab("condition")+
+  ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
+  theme_minimal()
