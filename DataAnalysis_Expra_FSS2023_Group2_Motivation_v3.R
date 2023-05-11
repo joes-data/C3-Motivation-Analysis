@@ -113,16 +113,25 @@ data_exclusion_MC <- data_wo_quality %>%
     TRUE ~ "incorrect"
   )) %>%
   filter(AC_correct == "correct") %>%
+  # remove those who used a smartphone.
+  filter(device != "Smartphone") %>%
+  # exclude not_english speaking
+  mutate(language_r_exclude = case_when(
+    language == "fluent_german" ~ "fluent_english",
+    language == "german" ~ "english",
+    language == "not_german" ~ "not_english"
+  )) %>%
+  filter(language_r_exclude != "not_english") %>%
   # clean data set: remove variables used for exclusion of participants
-  select(-c(AC_environment_true_preserve:AC_economy_true_modern, political_attitude_mc, AC_correct))
+  select(-c(AC_environment_true_preserve:AC_economy_true_modern, political_attitude_mc, AC_correct, language_r_exclude))
 
 # Sample size
-n_distinct(data_exclusion_MC$VPN) # 76 participants
+n_distinct(data_exclusion_MC$VPN) # 53 participants
 
 # Sample size per condition
 data_exclusion_MC %>% group_by(condition) %>% summarise(n = n_distinct(VPN))
 
-# 23 control, 29 economy, 24 environment 
+# 15 control, 21 economy, 17 environment 
 
 # 2) Inspect socio-demographics -------------------------------------------
 
@@ -447,7 +456,21 @@ between_contrast_3 <- contrast(refGrid_3, list(contrast_H3))
 
 ## 2) Influence of covariates
 
+# MODERATOR
+
+# gender (t-test: male vs. female on likelihood decision)
+
+# political attitude (Regression: predictor political attitude on likelihood decision and probability source [data_H2])
+
+# MEDIATOR
+
+# Consciousness (Regression on likelihood_decision)
+
+# Tendency in preserving things (Regression on likelihood_decision)
+
 # PLOTS
+# Paste Prereqs here, e.g.: color or other theme related issues
+color_condition <- c("#CD853F", "steelblue", "darkgreen")
 
 ## (H1) Rated likelihood of building mine follows this pattern: pro-economy > control > pro-environment
 plot_data_1 <- data_H1 %>%
@@ -461,14 +484,14 @@ ggplot(data = plot_data_1, mapping = aes(x = condition, y = m, fill = condition)
   xlab("condition")+
   ggtitle("Likelihood to build the mine")+
   theme_minimal()+
-  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+  scale_fill_manual(values = color_condition)
 
 #boxplot
 ggplot(data = data_H1, mapping = aes(x = condition, y = likelihood_decision, fill = condition))+
   geom_boxplot()+
   ggtitle("Likelihood to build the mine")+
   theme_minimal()+
-  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+  scale_fill_manual(values = color_condition)
 
 ## (H2) Probability of searching pro-economy information follows this pattern: pro-economy > control > pro-environment
 plot_data_2 <- data_H2 %>%
@@ -482,14 +505,14 @@ ggplot(data = plot_data_2, mapping = aes(x = condition, y = m, fill = condition)
   xlab("condition")+
   ggtitle("Percentage of opened economy related claims")+
   theme_minimal()+
-  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+  scale_fill_manual(values = color_condition)
 
 #boxplot
 ggplot(data = data_H2, mapping = aes(x = condition, y = probability_source, fill = condition))+
   geom_boxplot()+
   ggtitle("Percentage of opened economy related claims")+
   theme_minimal()+
-  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+  scale_fill_manual(values = color_condition)
 
 ## (H3) Rating of neutral information as speaking for building the mine follows this pattern: pro-economy > control > pro-environment
 plot_data_3 <- data_H3 %>%
@@ -503,11 +526,11 @@ ggplot(data = plot_data_3, mapping = aes(x = condition, y = m, fill = condition)
   xlab("condition")+
   ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
   theme_minimal()+
-  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+  scale_fill_manual(values = color_condition)
 
 #boxplot
 ggplot(data = data_H3, mapping = aes(x = condition, y = mean_eval_info, fill = condition))+
   geom_boxplot()+
   ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
   theme_minimal()+
-  scale_fill_manual(values = c("#CD853F", "steelblue", "darkgreen"))
+  scale_fill_manual(values = color_condition)
