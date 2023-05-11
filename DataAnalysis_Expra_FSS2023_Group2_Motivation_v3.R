@@ -121,12 +121,12 @@ data_exclusion_MC <- data_wo_quality %>%
     language == "german" ~ "english",
     language == "not_german" ~ "not_english"
   )) %>%
-  filter(language_r_exclude != "not_english") %>%
+  #filter(language_r_exclude != "not_english") %>%
   # clean data set: remove variables used for exclusion of participants
   select(-c(AC_environment_true_preserve:AC_economy_true_modern, political_attitude_mc, AC_correct, language_r_exclude))
 
 # Sample size
-n_distinct(data_exclusion_MC$VPN) # 53 participants
+n_distinct(data_exclusion_MC$VPN) # 70 participants
 
 # Sample size per condition
 data_exclusion_MC %>% group_by(condition) %>% summarise(n = n_distinct(VPN))
@@ -376,13 +376,15 @@ data_H1 <- data_scales %>%
   select(VPN, condition, likelihood_decision)
   
 # Run analysis: ANOVA with contrasts (use 'aov_ez' function from afex package)
-data_H1$condition <- as.factor(data_H1$condition) #CHECK when changing data set (levels: control pro_economy pro_environment)
-contrast_H1 <- c(0, 1, -1)
+data_H1$condition <- as.factor(data_H1$condition) %>%
+  factor(levels = c("pro_environment", "control", "pro_economy")) #CHECK when changing data set (levels: control pro_economy pro_environment)
+contrast_H1 <- c(-1, 0, 1)
+orthogonal_H1 <- c(-1, 2, -1)
 
 #create reference grid
 refGrid_1 <- emmeans(aov_ez(id = "VPN", data = data_H1, dv = "likelihood_decision", 
                           between = c("condition")), specs = c("condition"))
-between_contrast_1 <- contrast(refGrid_1, list(contrast_H1))
+between_contrast_1 <- contrast(refGrid_1, list(contrast_H1, orthogonal_H1))
 
 # one-factor ANOVA without planned contrasts
 between <- aov_ez(id = "VPN", dv = "likelihood_decision", data = data_H1, between = "condition")
@@ -414,13 +416,15 @@ data_H2 <- data_scales %>%
   select(VPN, condition, probability_source)
 
 # Run analysis: ANOVA with contrasts
-data_H2$condition <- as.factor(data_H2$condition) #CHECK when changing data set (levels: control pro_economy pro_environment)
-contrast_H2 <- c(0, 1, -1)
+data_H2$condition <- as.factor(data_H2$condition) %>%
+  factor(levels = c("pro_environment", "control", "pro_economy"))#CHECK when changing data set (levels: control pro_economy pro_environment)
+contrast_H2 <- c(-1, 0, 1)
+orthogonal_H2 <- c(-1, 2, -1)
 
 #create reference grid
 refGrid_2 <- emmeans(aov_ez(id = "VPN", data = data_H2, dv = "probability_source", 
                             between = c("condition")), specs = c("condition"))
-between_contrast_2 <- contrast(refGrid_2, list(contrast_H2))
+between_contrast_2 <- contrast(refGrid_2, list(contrast_H2, orthogonal_H2))
 
 ## (H3) Rating of neutral information as speaking for building the mine follows this pattern: pro-economy > control > pro-environment
 
@@ -433,13 +437,15 @@ data_H3 <- data_scales %>%
   summarise(mean_eval_info = mean(eval_info))
 
 # Run analysis: ANOVA with contrasts
-data_H3$condition <- as.factor(data_H3$condition) #CHECK when changing data set (levels: control pro_economy pro_environment)
-contrast_H3 <- c(0, 1, -1)
+data_H3$condition <- as.factor(data_H3$condition) %>%
+  factor(levels = c("pro_environment", "control", "pro_economy"))#CHECK when changing data set (levels: control pro_economy pro_environment)
+contrast_H3 <- c(-1, 0, 1)
+orthogonal_H3 <- c(-1, 2, -1)
 
 #create reference grid
 refGrid_3 <- emmeans(aov_ez(id = "VPN", data = data_H3, dv = "mean_eval_info", 
                             between = c("condition")), specs = c("condition"))
-between_contrast_3 <- contrast(refGrid_3, list(contrast_H3))
+between_contrast_3 <- contrast(refGrid_3, list(contrast_H3, orthogonal_H3))
 
 ## (H4a) Rating of information at t-1 predicts rating of case at t
 ## (H4b)Relationship of ratings is moderated by motivation manipulation
@@ -468,9 +474,28 @@ between_contrast_3 <- contrast(refGrid_3, list(contrast_H3))
 
 # Tendency in preserving things (Regression on likelihood_decision)
 
+# t-TESTS
+environmet_2 <- subset(data_H2, condition = "pro_environment")
+economy_2 <- subset(data_H2, condition = "pro_economy")
+control_2 <- subset(data_H2, condition = "control")
+
+t.test(environmet_2$probability_source, mu = .50, alternative = "greater") 
+t.test(economy_2$probability_source, mu = .50, alternative = "greater") 
+t.test(control_2$probability_source, mu = .50, alternative = "greater") 
+# --> in all conditions information is not rated significantly greater than .50
+
+environmet_1 <- subset(data_H1, condition = "pro_environment")
+economy_1 <- subset(data_H1, condition = "pro_economy")
+control_1 <- subset(data_H1, condition = "control")
+
+t.test(environmet_1$likelihood_decision, mu = .50, alternative = "greater") 
+t.test(economy_1$likelihood_decision, mu = .50, alternative = "greater") 
+t.test(control_1$likelihood_decision, mu = .50, alternative = "greater")
+
 # PLOTS
 # Paste Prereqs here, e.g.: color or other theme related issues
-color_condition <- c("#CD853F", "steelblue", "darkgreen")
+color_condition <- c("darkgreen", "#006473", "#CD853F")
+fz <- 12
 
 ## (H1) Rated likelihood of building mine follows this pattern: pro-economy > control > pro-environment
 plot_data_1 <- data_H1 %>%
@@ -480,18 +505,27 @@ plot_data_1 <- data_H1 %>%
 #barplot
 ggplot(data = plot_data_1, mapping = aes(x = condition, y = m, fill = condition))+
   geom_bar(stat = "identity")+
-  ylab("mean")+
-  xlab("condition")+
-  ggtitle("Likelihood to build the mine")+
+  ylab("Likelihood to build the mine in %")+
+  xlab("Political Campaign")+
+  scale_x_discrete(labels = c("Environment", "Education (Control)", "Economy"))+
   theme_minimal()+
-  scale_fill_manual(values = color_condition)
+  scale_fill_manual("Political Campaign", values = color_condition, labels = c("Environment", "Education (Control)", "Economy"))+
+  theme(axis.text = element_text(size = fz), axis.title=element_text(size=fz), 
+        legend.title=element_text(size=fz), legend.text=element_text(size=fz),
+        legend.position = "none")
 
 #boxplot
 ggplot(data = data_H1, mapping = aes(x = condition, y = likelihood_decision, fill = condition))+
   geom_boxplot()+
-  ggtitle("Likelihood to build the mine")+
+  ylab("Likelihood to build the mine in %")+
+  xlab("Political Campaign")+
+  scale_x_discrete(labels = c("Environment", "Education (Control)", "Economy"))+
   theme_minimal()+
-  scale_fill_manual(values = color_condition)
+  scale_fill_manual("Political Campaign", values = color_condition, labels = c("Environment", "Education (Control)", "Economy"))+
+  theme(axis.text = element_text(size = fz), axis.title=element_text(size=fz), 
+        legend.title=element_text(size=fz), legend.text=element_text(size=fz),
+        legend.position = "none")
+
 
 ## (H2) Probability of searching pro-economy information follows this pattern: pro-economy > control > pro-environment
 plot_data_2 <- data_H2 %>%
@@ -501,18 +535,28 @@ plot_data_2 <- data_H2 %>%
 #barplot
 ggplot(data = plot_data_2, mapping = aes(x = condition, y = m, fill = condition))+
   geom_bar(stat = "identity")+
-  ylab("mean")+
-  xlab("condition")+
-  ggtitle("Percentage of opened economy related claims")+
+  ylab("Opened economy related claims in %")+
+  xlab("Political Campaign")+
+  scale_x_discrete(labels = c("Environment", "Education (Control)", "Economy"))+
   theme_minimal()+
-  scale_fill_manual(values = color_condition)
+  scale_fill_manual("Political Campaign", values = color_condition, labels = c("Environment", "Education (Control)", "Economy"))+
+  theme(axis.text = element_text(size = fz), axis.title=element_text(size=fz), 
+        legend.title=element_text(size=fz), legend.text=element_text(size=fz),
+        legend.position = "none")
+
+
 
 #boxplot
 ggplot(data = data_H2, mapping = aes(x = condition, y = probability_source, fill = condition))+
   geom_boxplot()+
-  ggtitle("Percentage of opened economy related claims")+
+  ylab("Opened economy related claims in %")+
+  xlab("Political Campaign")+
+  scale_x_discrete(labels = c("Environment", "Education (Control)", "Economy"))+
   theme_minimal()+
-  scale_fill_manual(values = color_condition)
+  scale_fill_manual("Political Campaign", values = color_condition, labels = c("Environment", "Education (Control)", "Economy"))+
+  theme(axis.text = element_text(size = fz), axis.title=element_text(size=fz), 
+        legend.title=element_text(size=fz), legend.text=element_text(size=fz),
+        legend.position = "none")
 
 ## (H3) Rating of neutral information as speaking for building the mine follows this pattern: pro-economy > control > pro-environment
 plot_data_3 <- data_H3 %>%
@@ -522,15 +566,24 @@ plot_data_3 <- data_H3 %>%
 #barplot
 ggplot(data = plot_data_3, mapping = aes(x = condition, y = m, fill = condition))+
   geom_bar(stat = "identity")+
-  ylab("mean")+
-  xlab("condition")+
-  ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
+  ylab("Rating ambgious information as pro economic in %")+
+  xlab("Political Campaign")+
+  scale_x_discrete(labels = c("Environment", "Education (Control)", "Economy"))+
   theme_minimal()+
-  scale_fill_manual(values = color_condition)
+  scale_fill_manual("Political Campaign", values = color_condition, labels = c("Environment", "Education (Control)", "Economy"))+
+  theme(axis.text = element_text(size = fz), axis.title=element_text(size=fz), 
+        legend.title=element_text(size=fz), legend.text=element_text(size=fz),
+        legend.position = "none")
+
 
 #boxplot
 ggplot(data = data_H3, mapping = aes(x = condition, y = mean_eval_info, fill = condition))+
   geom_boxplot()+
-  ggtitle("Evaluation of tendency to build the mine of ambiguous arguments")+
+  ylab("Rating ambgious information as pro economic in %")+
+  xlab("Political Campaign")+
+  scale_x_discrete(labels = c("Environment", "Education (Control)", "Economy"))+
   theme_minimal()+
-  scale_fill_manual(values = color_condition)
+  scale_fill_manual("Political Campaign", values = color_condition, labels = c("Environment", "Education (Control)", "Economy"))+
+  theme(axis.text = element_text(size = fz), axis.title=element_text(size=fz), 
+        legend.title=element_text(size=fz), legend.text=element_text(size=fz),
+        legend.position = "none")
