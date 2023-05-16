@@ -475,26 +475,26 @@ between_contrast_3 <- contrast(refGrid_3, list(contrast_H3, orthogonal_H3))
 # Tendency in preserving things (Regression on likelihood_decision)
 
 # t-TESTS
-environmet_2 <- subset(data_H2, condition = "pro_environment")
-economy_2 <- subset(data_H2, condition = "pro_economy")
-control_2 <- subset(data_H2, condition = "control")
+environmet_2 <- subset(data_H2, condition == "pro_environment")
+economy_2 <- subset(data_H2, condition == "pro_economy")
+control_2 <- subset(data_H2, condition == "control")
 
-t.test(environmet_2$probability_source, mu = .50, alternative = "greater") 
-t.test(economy_2$probability_source, mu = .50, alternative = "greater") 
-t.test(control_2$probability_source, mu = .50, alternative = "greater") 
-# --> in all conditions information is not rated significantly greater than .50
+t.test(environmet_2$probability_source, mu = 50, alternative = "greater") 
+t.test(economy_2$probability_source, mu = 50, alternative = "greater") 
+t.test(control_2$probability_source, mu = 50, alternative = "greater") 
+# --> in all conditions economic information has not make out more than .50
 
-environmet_1 <- subset(data_H1, condition = "pro_environment")
-economy_1 <- subset(data_H1, condition = "pro_economy")
-control_1 <- subset(data_H1, condition = "control")
+environmet_1 <- subset(data_H1, condition == "pro_environment")
+economy_1 <- subset(data_H1, condition == "pro_economy")
+control_1 <- subset(data_H1, condition == "control")
 
-t.test(environmet_1$likelihood_decision, mu = .50, alternative = "greater") 
-t.test(economy_1$likelihood_decision, mu = .50, alternative = "greater") 
-t.test(control_1$likelihood_decision, mu = .50, alternative = "greater")
+t.test(environmet_1$likelihood_decision, mu = 50, alternative = "two.sided") 
+t.test(economy_1$likelihood_decision, mu = 50, alternative = "two.sided") 
+t.test(control_1$likelihood_decision, mu = 50, alternative = "two.sided")
 
 # PLOTS
 # Paste Prereqs here, e.g.: color or other theme related issues
-color_condition <- c("darkgreen", "#006473", "#CD853F")
+color_condition <- c("#006400", "#006473", "#C8102E")# "#CD853F"
 fz <- 12
 
 ## (H1) Rated likelihood of building mine follows this pattern: pro-economy > control > pro-environment
